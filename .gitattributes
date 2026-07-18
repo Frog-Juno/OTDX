@@ -1,0 +1,5 @@
+# Byte integrity matters: payload_sha256 and signatures are computed over exact
+# file bytes. Force LF everywhere and mark binaries so no platform rewrites them.
+* text=auto eol=lf
+*.zst binary
+*.png binary

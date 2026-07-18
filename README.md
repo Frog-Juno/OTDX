@@ -51,7 +51,7 @@ claim-bound) raw payload relay. See **[SPEC.md](SPEC.md)** for the full standard
 Requires Python 3.10+:
 
 ```bash
-pip install jsonschema zstandard cryptography
+pip install -r requirements.txt
 ```
 
 Validate a golden example (signature checked with the test key):
