@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "otdx-payload.schema.json",
+  "title": "OTDX PayloadEvent (payload profile standalone record, draft 0.1)",
+  "type": "object",
+  "required": ["type", "event_id", "provider", "tag", "location", "at"],
+  "anyOf": [
+    {"required": ["data"]},
+    {"required": ["payload_sha256"]}
+  ],
+  "properties": {
+    "type": {"const": "payload"},
+    "event_id": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "provider": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+    "tag": {"$ref": "otdx-defs.schema.json#/$defs/tagUri"},
+    "location": {"$ref": "otdx-defs.schema.json#/$defs/location"},
+    "at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "data": {"$ref": "otdx-defs.schema.json#/$defs/base64"},
+    "payload_sha256": {"$ref": "otdx-defs.schema.json#/$defs/sha256hex"},
+    "encoding": {"type": "string"}
+  },
+  "additionalProperties": true
+}

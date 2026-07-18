@@ -1,0 +1,1 @@
+{"type":"presence","event_id":"3dff5c5a-9c59-7610-830d-331e1dae02f5","provider":"example","tag":"tag:example:mac48:2cdc78051a2b","location":{"id":"loc:iata:station:NSN","geo":{"lat":-41.2983,"lon":173.221,"radius_m":70}},"window":{"first_seen":"2026-07-18T02:14:07Z","last_seen":"2026-07-18T02:14:07Z","open":true},"observations":12,"asserted_at":"2026-07-18T03:00:00Z"}

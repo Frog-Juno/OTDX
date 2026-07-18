@@ -1,0 +1,1 @@
+{"type":"detection","event_id":"5d739f75-4142-70f7-8f45-6c7546980a11","provider":"example","tag":"tag:example:mac48:2cdc78051a2b","detector":"det:example:node:2561","location":{"id":"loc:example:site:S01"},"at":"2026-07-18T02:14:07Z","flag":"first","rssi":-74,"channel":37,"data":"AgEG"}

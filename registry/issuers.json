@@ -1,0 +1,9 @@
+{
+  "comment": "OTDX issuer short-name registry (SPEC 10). Reserved names below; to register an issuer, open a pull request adding an entry.",
+  "issuers": {
+    "example": {"reserved": true, "purpose": "documentation and test vectors"},
+    "acme": {"reserved": true, "purpose": "documentation and test vectors"},
+    "iata": {"reserved": true, "purpose": "IATA station codes (loc scheme 'station')"},
+    "unlocode": {"reserved": true, "purpose": "UN/LOCODE location codes"}
+  }
+}

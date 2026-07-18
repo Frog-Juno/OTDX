@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""otdx-sign — generate keys, sign and verify OTDX batch envelopes.
+
+Usage:
+  otdx-sign keygen --out <basename>            writes <basename>.pem + <basename>.pub
+  otdx-sign sign --key <priv.pem> --key-id <id> <envelope.json>
+                                               adds/replaces "signature" in place
+  otdx-sign verify --pubkey <pub.pem> <envelope.json>
+
+The signature is Ed25519 over the JCS-canonical envelope with the "signature"
+member removed (see otdxlib.canonical_bytes for the canonicalisation note).
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import otdxlib  # noqa: E402
+
+from cryptography.hazmat.primitives import serialization  # noqa: E402
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey  # noqa: E402
+
+
+def cmd_keygen(args):
+    key = Ed25519PrivateKey.generate()
+    priv = key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption(),
+    )
+    pub = key.public_key().public_bytes(
+        serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    Path(args.out + ".pem").write_bytes(priv)
+    Path(args.out + ".pub").write_bytes(pub)
+    print(f"wrote {args.out}.pem and {args.out}.pub")
+
+
+def cmd_sign(args):
+    path = Path(args.envelope)
+    envelope = json.loads(path.read_text(encoding="utf-8"))
+    key = otdxlib.load_private_key(Path(args.key))
+    otdxlib.sign_envelope(envelope, key, args.key_id)
+    path.write_text(json.dumps(envelope, indent=2) + "\n", encoding="utf-8")
+    print(f"signed {path} (key_id={args.key_id})")
+
+
+def cmd_verify(args):
+    envelope = json.loads(Path(args.envelope).read_text(encoding="utf-8"))
+    key = otdxlib.load_public_key(Path(args.pubkey))
+    if otdxlib.verify_envelope(envelope, key):
+        print("signature OK")
+    else:
+        print("signature INVALID")
+        sys.exit(1)
+
+
+def main():
+    p = argparse.ArgumentParser(prog="otdx-sign")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    k = sub.add_parser("keygen")
+    k.add_argument("--out", required=True, help="output basename")
+    k.set_defaults(fn=cmd_keygen)
+
+    s = sub.add_parser("sign")
+    s.add_argument("--key", required=True)
+    s.add_argument("--key-id", required=True)
+    s.add_argument("envelope")
+    s.set_defaults(fn=cmd_sign)
+
+    v = sub.add_parser("verify")
+    v.add_argument("--pubkey", required=True)
+    v.add_argument("envelope")
+    v.set_defaults(fn=cmd_verify)
+
+    args = p.parse_args()
+    args.fn(args)
+
+
+if __name__ == "__main__":
+    main()

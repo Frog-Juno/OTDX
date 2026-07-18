@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "otdx-detection.schema.json",
+  "title": "OTDX DetectionEvent (granular profile, draft 0.1)",
+  "type": "object",
+  "required": ["type", "event_id", "provider", "tag", "detector", "location", "at", "flag"],
+  "properties": {
+    "type": {"const": "detection"},
+    "event_id": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "provider": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+    "tag": {"$ref": "otdx-defs.schema.json#/$defs/tagUri"},
+    "detector": {"$ref": "otdx-defs.schema.json#/$defs/detUri"},
+    "location": {"$ref": "otdx-defs.schema.json#/$defs/location"},
+    "at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "flag": {"enum": ["first", "heartbeat", "last"]},
+    "rssi": {"type": "integer", "maximum": 0},
+    "channel": {"type": "integer", "minimum": 0, "maximum": 39},
+
+    "data": {
+      "$ref": "otdx-defs.schema.json#/$defs/base64",
+      "description": "payload profile: raw advertisement payload, <= 255 bytes decoded"
+    },
+    "payload_sha256": {
+      "$ref": "otdx-defs.schema.json#/$defs/sha256hex",
+      "description": "payload profile"
+    },
+    "encoding": {"type": "string", "description": "payload profile: issuer-scoped hint"},
+
+    "tag_geo": {
+      "$ref": "otdx-defs.schema.json#/$defs/geo",
+      "description": "fineposition profile"
+    },
+    "method": {
+      "type": "string",
+      "enum": ["trilateration", "ranging", "fingerprint", "reader"],
+      "description": "fineposition profile"
+    }
+  },
+  "additionalProperties": true
+}

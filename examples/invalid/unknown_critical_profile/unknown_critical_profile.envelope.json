@@ -1,0 +1,20 @@
+{
+  "otdx": "0.1",
+  "batch_id": "0b480fb5-800d-78df-855c-5830db174f39",
+  "provider": "example",
+  "profiles": [
+    {
+      "name": "frobnicate",
+      "critical": true
+    }
+  ],
+  "created_at": "2026-07-18T03:00:05Z",
+  "event_count": 1,
+  "payload_encoding": "jsonl",
+  "payload_sha256": "a394eaf6904cfb2d69a25fc78ecab0cf293027922e71e81f626574246a373fb8",
+  "signature": {
+    "alg": "Ed25519",
+    "key_id": "otdx-test-1",
+    "sig": "Zbn3p6OkQqPQ+Ys0BSlqUWa8KkCMcXkXe72Bg65NgsfZNIY6ZrcY8aAWHlC9L+ms5Ou9b8x5/aSjBIwTV28dCg=="
+  }
+}

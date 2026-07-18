@@ -1,0 +1,183 @@
+#!/usr/bin/env python3
+"""otdx-validate — validate an OTDX batch (envelope + event payload).
+
+Usage:
+  otdx-validate [--pubkey <pub.pem>] <envelope.json> [<payload-file>]
+
+If <payload-file> is omitted, looks for <batch_id>.jsonl / <batch_id>.jsonl.zst
+next to the envelope.
+
+Checks, in order:
+  1. envelope validates against otdx-envelope.schema.json
+  2. payload_sha256 matches the payload file bytes as transmitted
+  3. signature verifies (only if --pubkey given; envelopes without a signature
+     fail — the signature is REQUIRED by SPEC §6)
+  4. every event line validates against the schema for its record type
+  5. event_count matches; every event's provider matches the envelope
+  6. profile discipline:
+       - unknown profile marked critical  -> fail
+       - detection/payload record types without granular/payload declared -> fail
+       - payload fields (data/payload_sha256/encoding) on detection records
+         without the payload profile declared -> fail
+  7. windowing: presence windows for the same (tag, location.id) must not
+     overlap; first_seen <= last_seen
+
+Exit code 0 = PASS, 1 = FAIL.
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import otdxlib  # noqa: E402
+
+PAYLOAD_FIELDS = {"data", "payload_sha256", "encoding"}
+errors = []
+
+
+def err(msg):
+    errors.append(msg)
+    print(f"  FAIL: {msg}")
+
+
+def ok(msg):
+    print(f"  ok:   {msg}")
+
+
+def main():
+    p = argparse.ArgumentParser(prog="otdx-validate")
+    p.add_argument("--pubkey", help="verify envelope signature with this Ed25519 public key")
+    p.add_argument("envelope")
+    p.add_argument("payload", nargs="?")
+    args = p.parse_args()
+
+    env_path = Path(args.envelope)
+    print(f"validating {env_path}")
+    envelope = json.loads(env_path.read_text(encoding="utf-8"))
+    validators = otdxlib.make_validators()
+
+    # 1. envelope schema
+    schema_errors = list(validators["otdx-envelope.schema.json"].iter_errors(envelope))
+    if schema_errors:
+        for e in schema_errors[:5]:
+            err(f"envelope schema: {'/'.join(map(str, e.path)) or '(root)'}: {e.message}")
+    else:
+        ok("envelope schema")
+
+    # locate payload
+    if args.payload:
+        payload_path = Path(args.payload)
+    else:
+        base = env_path.parent / envelope.get("batch_id", "")
+        payload_path = None
+        for suffix in (".jsonl", ".jsonl.zst"):
+            cand = Path(str(base) + suffix)
+            if cand.exists():
+                payload_path = cand
+                break
+        if payload_path is None:
+            err(f"payload file not found next to envelope (batch_id={envelope.get('batch_id')})")
+            return finish()
+    payload_bytes = payload_path.read_bytes()
+
+    # 2. payload hash
+    actual = otdxlib.sha256_hex(payload_bytes)
+    if actual != envelope.get("payload_sha256"):
+        err(f"payload_sha256 mismatch: envelope={envelope.get('payload_sha256')} actual={actual}")
+    else:
+        ok("payload_sha256")
+
+    # 3. signature
+    if args.pubkey:
+        key = otdxlib.load_public_key(Path(args.pubkey))
+        if "signature" not in envelope:
+            err("envelope has no signature (REQUIRED, SPEC §6)")
+        elif otdxlib.verify_envelope(envelope, key):
+            ok("signature")
+        else:
+            err("signature verification failed")
+
+    # decode events
+    try:
+        events = otdxlib.decode_events(payload_bytes, envelope.get("payload_encoding", "jsonl"))
+    except Exception as exc:
+        err(f"cannot decode payload: {exc}")
+        return finish()
+
+    # 4. per-event schema
+    bad = 0
+    for i, ev in enumerate(events):
+        rtype = ev.get("type")
+        schema_name = otdxlib.RECORD_SCHEMAS.get(rtype)
+        if schema_name is None:
+            err(f"event {i}: unknown record type {rtype!r}")
+            bad += 1
+            continue
+        for e in validators[schema_name].iter_errors(ev):
+            err(f"event {i} ({rtype}): {'/'.join(map(str, e.path)) or '(root)'}: {e.message}")
+            bad += 1
+    if bad == 0:
+        ok(f"event schemas ({len(events)} events)")
+
+    # 5. counts and provider
+    if envelope.get("event_count") != len(events):
+        err(f"event_count={envelope.get('event_count')} but payload has {len(events)} events")
+    else:
+        ok("event_count")
+    mismatched = [i for i, ev in enumerate(events) if ev.get("provider") != envelope.get("provider")]
+    if mismatched:
+        err(f"events {mismatched[:5]} provider does not match envelope provider")
+    else:
+        ok("provider consistency")
+
+    # 6. profile discipline
+    declared = {pr.get("name") for pr in envelope.get("profiles", [])}
+    for pr in envelope.get("profiles", []):
+        if pr.get("name") not in otdxlib.KNOWN_PROFILES and pr.get("critical"):
+            err(f"unknown critical profile {pr.get('name')!r}")
+    type_needs = {"detection": "granular", "payload": "payload"}
+    for i, ev in enumerate(events):
+        needed = type_needs.get(ev.get("type"))
+        if needed and needed not in declared:
+            err(f"event {i}: record type {ev.get('type')!r} requires profile {needed!r} (not declared)")
+        if ev.get("type") == "detection" and "payload" not in declared:
+            present = PAYLOAD_FIELDS & set(ev.keys())
+            if present:
+                err(f"event {i}: payload-profile fields {sorted(present)} without payload profile declared")
+
+    # 7. windowing
+    windows = {}
+    for i, ev in enumerate(events):
+        if ev.get("type") != "presence":
+            continue
+        w = ev.get("window", {})
+        first, last = w.get("first_seen"), w.get("last_seen")
+        if first and last and first > last:
+            err(f"event {i}: window first_seen > last_seen")
+        key = (ev.get("tag"), (ev.get("location") or {}).get("id"))
+        windows.setdefault(key, []).append((first, last, i))
+    overlap_found = False
+    for key, spans in windows.items():
+        spans.sort()
+        for (f1, l1, i1), (f2, l2, i2) in zip(spans, spans[1:]):
+            if l1 and f2 and f2 < l1:
+                err(f"events {i1} and {i2}: overlapping windows for {key}")
+                overlap_found = True
+    if not overlap_found:
+        ok("windowing")
+
+    return finish()
+
+
+def finish():
+    if errors:
+        print(f"RESULT: FAIL ({len(errors)} error(s))")
+        sys.exit(1)
+    print("RESULT: PASS")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

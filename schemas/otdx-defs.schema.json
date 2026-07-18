@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "otdx-defs.schema.json",
+  "title": "OTDX shared definitions (draft 0.1)",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "RFC 3339 UTC with Z suffix",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,9})?Z$"
+    },
+    "issuer": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+    },
+    "tagUri": {
+      "type": "string",
+      "pattern": "^tag:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9][a-z0-9-]{0,31}:\\S+$"
+    },
+    "locUri": {
+      "type": "string",
+      "pattern": "^loc:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9][a-z0-9-]{0,31}:\\S+$"
+    },
+    "detUri": {
+      "type": "string",
+      "pattern": "^det:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9][a-z0-9-]{0,31}:\\S+$"
+    },
+    "sha256hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "base64": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+    },
+    "geo": {
+      "type": "object",
+      "description": "WGS-84 point with likely-containment radius (SPEC §3.3)",
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": {"type": "number", "minimum": -90, "maximum": 90},
+        "lon": {"type": "number", "minimum": -180, "maximum": 180},
+        "radius_m": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "additionalProperties": true
+    },
+    "location": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"$ref": "otdx-defs.schema.json#/$defs/locUri"},
+        "sublocation": {"type": "string", "maxLength": 256},
+        "geo": {"$ref": "otdx-defs.schema.json#/$defs/geo"}
+      },
+      "additionalProperties": true
+    },
+    "window": {
+      "type": "object",
+      "required": ["first_seen", "last_seen", "open"],
+      "properties": {
+        "first_seen": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+        "last_seen": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+        "open": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    }
+  }
+}

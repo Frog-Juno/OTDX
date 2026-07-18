@@ -1,0 +1,15 @@
+{
+  "otdx": "0.1",
+  "batch_id": "8a21c8a1-0ccf-7ce6-84f5-668abc1c4c20",
+  "provider": "example",
+  "profiles": [],
+  "created_at": "2026-07-18T03:00:05Z",
+  "event_count": 1,
+  "payload_encoding": "jsonl",
+  "payload_sha256": "aa24f6bffc6c09e6ace25e282aabbe1efa6d7796e30efb97f168aeefc633c958",
+  "signature": {
+    "alg": "Ed25519",
+    "key_id": "otdx-test-1",
+    "sig": "oPwpzvwsS3kVHwQpyG8lekqMWexdxz0qjmJCWUnBTXwzoX+GEkMEDia49toMf1b/533edVag4ZRRB2ECyLRJAw=="
+  }
+}

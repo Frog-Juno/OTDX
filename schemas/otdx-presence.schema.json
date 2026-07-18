@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "otdx-presence.schema.json",
+  "title": "OTDX PresenceEvent (core, draft 0.1)",
+  "type": "object",
+  "required": ["type", "event_id", "provider", "tag", "location", "window", "asserted_at"],
+  "properties": {
+    "type": {"const": "presence"},
+    "event_id": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "provider": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+    "tag": {"$ref": "otdx-defs.schema.json#/$defs/tagUri"},
+    "aliases": {
+      "type": "array",
+      "items": {"$ref": "otdx-defs.schema.json#/$defs/tagUri"}
+    },
+    "location": {"$ref": "otdx-defs.schema.json#/$defs/location"},
+    "window": {"$ref": "otdx-defs.schema.json#/$defs/window"},
+    "observations": {"type": "integer", "minimum": 0},
+    "asserted_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "supersedes": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "expires_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+
+    "rssi": {
+      "type": "object",
+      "description": "signal profile",
+      "properties": {
+        "min": {"type": "number"},
+        "max": {"type": "number"},
+        "median": {"type": "number"}
+      },
+      "additionalProperties": true
+    },
+    "detector_count": {"type": "integer", "minimum": 1, "description": "signal profile"},
+    "channel_set": {
+      "type": "array",
+      "items": {"type": "integer", "minimum": 0, "maximum": 39},
+      "description": "signal profile"
+    },
+    "tag_geo": {
+      "$ref": "otdx-defs.schema.json#/$defs/geo",
+      "description": "fineposition profile: position of the tag itself"
+    },
+    "method": {
+      "type": "string",
+      "description": "fineposition profile",
+      "enum": ["trilateration", "ranging", "fingerprint", "reader"]
+    }
+  },
+  "additionalProperties": true
+}
