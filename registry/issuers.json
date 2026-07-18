@@ -4,6 +4,9 @@
     "example": {"reserved": true, "purpose": "documentation and test vectors"},
     "acme": {"reserved": true, "purpose": "documentation and test vectors"},
     "iata": {"reserved": true, "purpose": "IATA station codes (loc scheme 'station')"},
-    "unlocode": {"reserved": true, "purpose": "UN/LOCODE location codes"}
+    "unlocode": {"reserved": true, "purpose": "UN/LOCODE location codes"},
+    "juno": {"purpose": "Juno region-neutral tag/loc identity (device-derived tag_id / MAC / node); every Juno server emits the same tag URI for the same physical tag"},
+    "juno-au": {"purpose": "Juno Australasia (AU region) provider / batch-signing identity"},
+    "juno-cn": {"purpose": "Juno China (CN region) provider / batch-signing identity"}
   }
 }
