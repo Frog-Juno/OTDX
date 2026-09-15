@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "otdx-detector-status.schema.json",
+  "title": "OTDX DetectorStatus (detectorstatus profile, draft)",
+  "description": "Online/offline/retired assertion for one detector (reader). Emitted on state transitions (offline debounced) and in periodic roundups. See juno-docs/otdx/otdx_detector_status_and_visibility.md.",
+  "type": "object",
+  "required": ["type", "event_id", "provider", "detector", "state", "since", "asserted_at"],
+  "properties": {
+    "type": {"const": "detector_status"},
+    "event_id": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "provider": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+    "detector": {"$ref": "otdx-defs.schema.json#/$defs/detUri"},
+    "location": {"$ref": "otdx-defs.schema.json#/$defs/location"},
+    "device_type": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,15}$"},
+    "state": {"enum": ["online", "offline", "retired"]},
+    "since": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "asserted_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "reason": {"enum": ["lwt", "timeout", "clean_shutdown"]},
+    "supersedes": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
+    "roundup": {"type": "boolean"}
+  },
+  "additionalProperties": true
+}

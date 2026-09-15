@@ -27,13 +27,15 @@ SCHEMA_FILES = [
     "otdx-presence.schema.json",
     "otdx-detection.schema.json",
     "otdx-payload.schema.json",
+    "otdx-detector-status.schema.json",
 ]
 RECORD_SCHEMAS = {
     "presence": "otdx-presence.schema.json",
     "detection": "otdx-detection.schema.json",
     "payload": "otdx-payload.schema.json",
+    "detector_status": "otdx-detector-status.schema.json",
 }
-KNOWN_PROFILES = {"signal", "granular", "fineposition", "payload"}
+KNOWN_PROFILES = {"signal", "granular", "fineposition", "payload", "detectorstatus"}
 
 
 def canonical_bytes(envelope: dict) -> bytes:
