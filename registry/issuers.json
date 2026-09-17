@@ -7,6 +7,7 @@
     "unlocode": {"reserved": true, "purpose": "UN/LOCODE location codes"},
     "juno": {"purpose": "Juno region-neutral tag/loc identity (device-derived tag_id / MAC / node); every Juno server emits the same tag URI for the same physical tag"},
     "juno-au": {"purpose": "Juno Australasia (AU region) provider / batch-signing identity"},
-    "juno-cn": {"purpose": "Juno China (CN region) provider / batch-signing identity"}
+    "juno-cn": {"purpose": "Juno China (CN region) provider / batch-signing identity"},
+    "dev": {"purpose": "Juno development server provider / batch-signing identity (non-production; peers must never treat its records as a region feed)"}
   }
 }
