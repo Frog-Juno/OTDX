@@ -36,5 +36,6 @@
       "description": "fineposition profile"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "$comment": "origin / path (SPEC 3.5 relay) are permitted on every record type; see otdx-defs.schema.json"
 }

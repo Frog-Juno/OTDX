@@ -28,6 +28,27 @@
       "type": "string",
       "pattern": "^det:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9][a-z0-9-]{0,31}:\\S+$"
     },
+    "origin": {
+      "$ref": "otdx-defs.schema.json#/$defs/issuer",
+      "description": "Relay (SPEC 3.5): the provider that observed this record when it is not the batch signer. Absent = the signer observed it."
+    },
+    "path": {
+      "type": "array",
+      "description": "Relay (SPEC 3.5): providers this record has traversed, oldest first, excluding the signer. A receiver MUST discard a record whose path contains its own provider.",
+      "items": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+      "maxItems": 8
+    },
+    "via": {
+      "type": "object",
+      "description": "Relay (SPEC 3.5): timing of the origin's assertion as seen by the relaying signer, so a consumer can tell a stale link from a stale detector.",
+      "required": ["origin", "asserted_at", "received_at"],
+      "properties": {
+        "origin": {"$ref": "otdx-defs.schema.json#/$defs/issuer"},
+        "asserted_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+        "received_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"}
+      },
+      "additionalProperties": true
+    },
     "sha256hex": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"

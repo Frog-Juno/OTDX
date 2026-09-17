@@ -17,7 +17,10 @@
     "asserted_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
     "reason": {"enum": ["lwt", "timeout", "clean_shutdown"]},
     "supersedes": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
-    "roundup": {"type": "boolean"}
+    "roundup": {"type": "boolean"},
+    "origin": {"$ref": "otdx-defs.schema.json#/$defs/origin"},
+    "path": {"$ref": "otdx-defs.schema.json#/$defs/path"},
+    "via": {"$ref": "otdx-defs.schema.json#/$defs/via"}
   },
   "additionalProperties": true
 }

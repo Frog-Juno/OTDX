@@ -102,6 +102,26 @@ A location reference is an opaque code plus OPTIONAL geo:
 `provider` — the issuer short-name of the asserting provider. Bound to the batch
 signature (§6); an event's `provider` MUST match the signing identity of its batch.
 
+### 3.5 Relay and provenance (optional)
+A provider MAY re-assert a record it received from another provider, for example when
+one operator runs several regional servers and a consumer peers with only one of them.
+The relaying provider signs the batch, so `provider` is the relay (3.4 is unchanged);
+two optional fields carry the provenance:
+
+| Field | Req | Notes |
+|---|---|---|
+| `origin` | MAY | Issuer short-name of the provider that observed the record. Absent = the signer observed it |
+| `path` | MAY | Issuer short-names the record has traversed, oldest first, excluding the signer |
+
+Rules: a relay MUST NOT rewrite the record's identifiers (`tag`, `location.id`,
+`detector`), its `window` or `since`; it MAY drop fields its agreement with the receiver
+does not permit (geo, payload). A relay MUST set `origin` when it differs from itself and
+MUST append the previous signer to `path`. A receiver MUST discard a record whose `path`
+contains its own issuer, or whose `origin` is itself: that is the loop guard. Records
+that carry a liveness assertion (such as the `detectorstatus` profile) SHOULD add a
+`via` object `{origin, asserted_at, received_at}` giving the origin's assertion time and
+when the relay received it, so a consumer can tell a stale link from a stale detector.
+
 ## 4. Core record: PresenceEvent
 
 One tag, one detection scope, one contiguous time window.

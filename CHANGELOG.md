@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- §3.5 Relay and provenance: optional `origin`, `path` on every record and `via` on
+  liveness records; receivers discard records whose `path` contains themselves.
+  Schemas: `origin` / `path` / `via` definitions in `otdx-defs`, referenced from the
+  presence and detector_status records.
+
 ## 0.1 (draft) — 2026-07-18
 
 Initial public draft.

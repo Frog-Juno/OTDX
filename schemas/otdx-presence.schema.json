@@ -19,6 +19,8 @@
     "asserted_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
     "supersedes": {"$ref": "otdx-defs.schema.json#/$defs/uuid"},
     "expires_at": {"$ref": "otdx-defs.schema.json#/$defs/timestamp"},
+    "origin": {"$ref": "otdx-defs.schema.json#/$defs/origin"},
+    "path": {"$ref": "otdx-defs.schema.json#/$defs/path"},
 
     "rssi": {
       "type": "object",
