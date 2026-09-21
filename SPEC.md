@@ -158,6 +158,7 @@ Field rules:
 | `tag` | MUST | §3.2 URI |
 | `aliases` | MAY | Other IDs for the same tag |
 | `location` | MUST | §3.3; `geo` optional |
+| `detector` | MAY | §3.4-style `det:{issuer}:{scheme}:{value}` naming the reader that observed the window (the same URI the `detectorstatus` profile uses). Lets a receiver apply per-reader visibility when `location.id` names a shared place such as a station. Providers that expose reader-scoped feeds SHOULD send it |
 | `window.first_seen` / `last_seen` | MUST | RFC 3339 UTC, `Z` suffix, seconds resolution min; sub-second MAY |
 | `window.open` | MUST | `true` = tag still present at assertion time; a later event with the same tag+location continues or closes the interval |
 | `observations` | SHOULD | Count of underlying detections in the window — a cheap quality signal |

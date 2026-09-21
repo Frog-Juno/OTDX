@@ -32,6 +32,11 @@
       },
       "additionalProperties": true
     },
+    "detector": {
+      "type": "string",
+      "pattern": "^det:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9_-]+:[A-Za-z0-9._-]+$",
+      "description": "The detector (reader) that observed this window, det:{issuer}:{scheme}:{value}, the same URI the detectorstatus profile uses. Optional; lets a receiver apply per-reader visibility even when location.id names a shared place such as a station."
+    },
     "detector_count": {"type": "integer", "minimum": 1, "description": "signal profile"},
     "channel_set": {
       "type": "array",

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- §4 PresenceEvent: optional `detector` (det:{issuer}:{scheme}:{value}) naming the reader that
+  observed the window, so a receiver can apply per-reader visibility when `location.id` is a
+  shared place. Schema: `detector` in `otdx-presence`.
 - §3.5 Relay and provenance: optional `origin`, `path` on every record and `via` on
   liveness records; receivers discard records whose `path` contains themselves.
   Schemas: `origin` / `path` / `via` definitions in `otdx-defs`, referenced from the
